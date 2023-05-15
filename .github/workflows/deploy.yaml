@@ -17,16 +17,11 @@ jobs:
             run_id: context.runId
           })
 
-          if (approvals.data.length == 0){
-            core.setFailed(`There are no approvals for this deployment. This is not allowed.`);          
-            return; 
-          }
-
-          const latestApproval = approvals.data[0];
-          console.log(approvals);
-          if (latestApproval.user.login == context.actor){
-            core.setFailed(`Deployment to the environment is approved by the same person (${context.actor}) who initiated the deployment. This is not allowed.`);            
-            return;
+          for (const approval of approvals) {
+            if (approval.user.login == context.actor) {
+              core.setFailed(`Deployment was approved by the same person (${context.actor}) who initiated the deployment.`);            
+              return;
+            }
           }
     - run: |
         echo "Deploying..."
